@@ -35,13 +35,25 @@ if (!$gatewayParams['type']) {
 
 // Retrieve data returned in payment gateway callback
 // Varies per payment gateway
-$success = $_POST["x_status"];
-$invoiceId = $_POST["x_invoice_id"];
-$transactionId = $_POST["x_trans_id"];
-$paymentAmount = $_POST["x_amount"];
-$paymentFee = $_POST["x_fee"];
-$hash = $_POST["x_hash"];
-
+$invoiceId = $_POST["oid"];
+$transactionId = $_POST["refId"];
+$paymentAmount = $_POST["amt"];
+$paymentFee = 0.0;
+$url = "https://uat.esewa.com.np/epay/transrec";
+$data =[
+    'amt'=> $paymentAmount,
+    'rid'=> $transactionId,
+    'pid'=> $invoiceId,
+    'scd'=> 'EPAYTEST'
+];
+$curl = curl_init($url);
+curl_setopt($curl, CURLOPT_POST, true);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($curl);
+curl_close($curl);
+$response_code = $this->get_xml_node_value('response_code',$response );
+$success = trim($response_code) == 'Success'?true:false;
 $transactionStatus = $success ? 'Success' : 'Failure';
 
 /**

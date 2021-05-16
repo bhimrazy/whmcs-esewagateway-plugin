@@ -10,8 +10,8 @@
  *
  * Within the module itself, all functions must be prefixed with the module
  * filename, followed by an underscore, and then the function name. For this
- * example file, the filename is "gatewaymodule" and therefore all functions
- * begin "gatewaymodule_".
+ * example file, the filename is "esewagateway" and therefore all functions
+ * begin "esewagateway_".
  *
  * If your module or third party API does not support a given function, you
  * should not define that function within your module. Only the _config
@@ -39,10 +39,10 @@ if (!defined("WHMCS")) {
  *
  * @return array
  */
-function gatewaymodule_MetaData()
+function esewagateway_MetaData()
 {
     return array(
-        'DisplayName' => 'Sample Payment Gateway Module',
+        'DisplayName' => 'Esewa Payment Gateway Module',
         'APIVersion' => '1.1', // Use API Version 1.1
         'DisableLocalCreditCardInput' => true,
         'TokenisedStorage' => false,
@@ -69,14 +69,14 @@ function gatewaymodule_MetaData()
  *
  * @return array
  */
-function gatewaymodule_config()
+function esewagateway_config()
 {
     return array(
         // the friendly display name for a payment gateway should be
         // defined here for backwards compatibility
         'FriendlyName' => array(
             'Type' => 'System',
-            'Value' => 'Sample Third Party Payment Gateway Module',
+            'Value' => 'eSewa.com Payment Gateway',
         ),
         // a text field type allows for single line text input
         'accountID' => array(
@@ -100,32 +100,6 @@ function gatewaymodule_config()
             'Type' => 'yesno',
             'Description' => 'Tick to enable test mode',
         ),
-        // the dropdown field type renders a select menu of options
-        'dropdownField' => array(
-            'FriendlyName' => 'Dropdown Field',
-            'Type' => 'dropdown',
-            'Options' => array(
-                'option1' => 'Display Value 1',
-                'option2' => 'Second Option',
-                'option3' => 'Another Option',
-            ),
-            'Description' => 'Choose one',
-        ),
-        // the radio field type displays a series of radio button options
-        'radioField' => array(
-            'FriendlyName' => 'Radio Field',
-            'Type' => 'radio',
-            'Options' => 'First Option,Second Option,Third Option',
-            'Description' => 'Choose your option!',
-        ),
-        // the textarea field type allows for multi-line text input
-        'textareaField' => array(
-            'FriendlyName' => 'Textarea Field',
-            'Type' => 'textarea',
-            'Rows' => '3',
-            'Cols' => '60',
-            'Description' => 'Freeform multi-line text input field',
-        ),
     );
 }
 
@@ -143,7 +117,7 @@ function gatewaymodule_config()
  *
  * @return string
  */
-function gatewaymodule_link($params)
+function esewagateway_link($params)
 {
     // Gateway Configuration Parameters
     $accountId = $params['accountID'];
@@ -180,26 +154,18 @@ function gatewaymodule_link($params)
     $moduleName = $params['paymentmethod'];
     $whmcsVersion = $params['whmcsVersion'];
 
-    $url = 'https://www.demopaymentgateway.com/do.payment';
+    $url = 'https://uat.esewa.com.np/epay/main';
 
     $postfields = array();
-    $postfields['username'] = $username;
-    $postfields['invoice_id'] = $invoiceId;
-    $postfields['description'] = $description;
-    $postfields['amount'] = $amount;
-    $postfields['currency'] = $currencyCode;
-    $postfields['first_name'] = $firstname;
-    $postfields['last_name'] = $lastname;
-    $postfields['email'] = $email;
-    $postfields['address1'] = $address1;
-    $postfields['address2'] = $address2;
-    $postfields['city'] = $city;
-    $postfields['state'] = $state;
-    $postfields['postcode'] = $postcode;
-    $postfields['country'] = $country;
-    $postfields['phone'] = $phone;
-    $postfields['callback_url'] = $systemUrl . '/modules/gateways/callback/' . $moduleName . '.php';
-    $postfields['return_url'] = $returnUrl;
+    $postfields['pid'] = $invoiceId;
+    $postfields['amt'] = $amount;
+    $postfields['pdc'] = 0;
+    $postfields['psc'] = 0;
+    $postfields['txAmt'] = 0;
+    $postfields['tAmt'] = $amount;
+    $postfields['scd'] = EPAYTEST;
+    $postfields['su'] = $systemUrl . '/modules/gateways/callback/' . $moduleName . '.php';
+    $postfields['fu'] = $returnUrl;
 
     $htmlOutput = '<form method="post" action="' . $url . '">';
     foreach ($postfields as $k => $v) {
@@ -222,7 +188,7 @@ function gatewaymodule_link($params)
  *
  * @return array Transaction response status
  */
-function gatewaymodule_refund($params)
+function esewagateway_refund($params)
 {
     // Gateway Configuration Parameters
     $accountId = $params['accountID'];
@@ -284,7 +250,7 @@ function gatewaymodule_refund($params)
  *
  * @return array Transaction response status
  */
-function gatewaymodule_cancelSubscription($params)
+function esewagateway_cancelSubscription($params)
 {
     // Gateway Configuration Parameters
     $accountId = $params['accountID'];
