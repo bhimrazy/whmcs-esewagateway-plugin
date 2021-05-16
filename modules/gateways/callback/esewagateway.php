@@ -63,11 +63,11 @@ $transactionStatus = $success ? 'Success' : 'Failure';
  * originated from them. In the case of our example here, this is achieved by
  * way of a shared secret which is used to build and compare a hash.
  */
-$secretKey = $gatewayParams['secretKey'];
-if ($hash != md5($invoiceId . $transactionId . $paymentAmount . $secretKey)) {
-    $transactionStatus = 'Hash Verification Failure';
-    $success = false;
-}
+// $secretKey = $gatewayParams['secretKey'];
+// if ($hash != md5($invoiceId . $transactionId . $paymentAmount . $secretKey)) {
+//     $transactionStatus = 'Hash Verification Failure';
+//     $success = false;
+// }
 
 /**
  * Validate Callback Invoice ID.
