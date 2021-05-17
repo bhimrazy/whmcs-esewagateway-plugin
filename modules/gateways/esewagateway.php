@@ -1,12 +1,9 @@
 <?php
 /**
- * WHMCS Sample Payment Gateway Module
+ * WHMCS eSewa Payment Gateway Module
  *
  * Payment Gateway modules allow you to integrate payment solutions with the
  * WHMCS platform.
- *
- * This sample file demonstrates how a payment gateway module for WHMCS should
- * be structured and all supported functionality it can contain.
  *
  * Within the module itself, all functions must be prefixed with the module
  * filename, followed by an underscore, and then the function name. For this
@@ -65,7 +62,7 @@ function esewagateway_MetaData()
  * * textarea
  *
  * Examples of each field type and their possible configuration parameters are
- * provided in the sample function below.
+ * provided in the eSewa function below.
  *
  * @return array
  */
@@ -123,10 +120,7 @@ function esewagateway_link($params)
     $accountId = $params['accountID'];
     $secretKey = $params['secretKey'];
     $testMode = $params['testMode'];
-    $dropdownField = $params['dropdownField'];
-    $radioField = $params['radioField'];
-    $textareaField = $params['textareaField'];
-
+   
     // Invoice Parameters
     $invoiceId = $params['invoiceid'];
     $description = $params["description"];
@@ -154,7 +148,13 @@ function esewagateway_link($params)
     $moduleName = $params['paymentmethod'];
     $whmcsVersion = $params['whmcsVersion'];
 
-    $url = 'https://uat.esewa.com.np/epay/main';
+    if($testMode == 'on' || $testMode === true){
+        $url = 'https://uat.esewa.com.np/epay/main';   //enter test mode url here
+    }else{
+        $url = 'https://esewa.com.np/epay/main';        //enter live mode url here
+    }
+    $responseurl=$systemUrl."/modules/gateways/callback/esewagateway.php";
+    $cancelUrl=$systemUrl."/modules/gateways/callback/esewagateway.php";
 
     $postfields = array();
     $postfields['pid'] = $invoiceId;
@@ -163,9 +163,9 @@ function esewagateway_link($params)
     $postfields['psc'] = 0;
     $postfields['txAmt'] = 0;
     $postfields['tAmt'] = $amount;
-    $postfields['scd'] = EPAYTEST;
-    $postfields['su'] = $systemUrl . '/modules/gateways/callback/' . $moduleName . '.php';
-    $postfields['fu'] = $returnUrl;
+    $postfields['scd'] = "EPAYTEST";
+    $postfields['su'] = $responseurl;
+    $postfields['fu'] = $cancelUrl;
 
     $htmlOutput = '<form method="post" action="' . $url . '">';
     foreach ($postfields as $k => $v) {
@@ -250,33 +250,3 @@ function esewagateway_refund($params)
  *
  * @return array Transaction response status
  */
-function esewagateway_cancelSubscription($params)
-{
-    // Gateway Configuration Parameters
-    $accountId = $params['accountID'];
-    $secretKey = $params['secretKey'];
-    $testMode = $params['testMode'];
-    $dropdownField = $params['dropdownField'];
-    $radioField = $params['radioField'];
-    $textareaField = $params['textareaField'];
-
-    // Subscription Parameters
-    $subscriptionIdToCancel = $params['subscriptionID'];
-
-    // System Parameters
-    $companyName = $params['companyname'];
-    $systemUrl = $params['systemurl'];
-    $langPayNow = $params['langpaynow'];
-    $moduleDisplayName = $params['name'];
-    $moduleName = $params['paymentmethod'];
-    $whmcsVersion = $params['whmcsVersion'];
-
-    // perform API call to cancel subscription and interpret result
-
-    return array(
-        // 'success' if successful, any other value for failure
-        'status' => 'success',
-        // Data to be recorded in the gateway log - can be a string or array
-        'rawdata' => $responseData,
-    );
-}

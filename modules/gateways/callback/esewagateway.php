@@ -52,7 +52,21 @@ curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 $response = curl_exec($curl);
 curl_close($curl);
-$response_code = $this->get_xml_node_value('response_code',$response );
+function get_xml_node_value($node, $xml) {
+    if ($xml == false) {
+        return false;
+    }
+    $found = preg_match('#<'.$node.'(?:\s+[^>]+)?>(.*?)'.
+        '</'.$node.'>#s', $xml, $matches);
+    if ($found != false) {
+
+        return $matches[1];
+
+    }
+
+    return false;
+}
+$response_code =get_xml_node_value('response_code',$response );
 $success = trim($response_code) == 'Success'?true:false;
 $transactionStatus = $success ? 'Success' : 'Failure';
 
@@ -130,5 +144,10 @@ if ($success) {
         $paymentFee,
         $gatewayModuleName
     );
+    $sucessurl=$gatewayParams['systemurl'].'/viewinvoice.php?id='.$invoiceId.'&paymentsuccess=true';
+    header("Location:$sucessurl");
 
+}else{
+    $failurl=$gatewayParams['systemurl'].'/viewinvoice.php?id='.$invoiceId.'';
+    header("Location:$failurl");
 }
